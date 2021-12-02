@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KafkaDTO {
-    private PokeDadosDTO pokeDados;
+    private PokeDadosDTO pokemon;
+
 }

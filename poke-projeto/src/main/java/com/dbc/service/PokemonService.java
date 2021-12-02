@@ -4,8 +4,10 @@ import com.dbc.dto.*;
 import com.dbc.entity.PokemonEntity;
 import com.dbc.entity.StatusEntity;
 import com.dbc.exceptions.RegraDeNegocioException;
+import com.dbc.kafka.Producer;
 import com.dbc.repository.HabilidadeRepository;
 import com.dbc.repository.PokemonRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class PokemonService {
     private final HabilidadeRepository habilidadeRepository;
     private final EvolucaoService evolucaoService;
     private final ObjectMapper objectMapper;
+    private final PokeDadosService pokeDadosService;
+    private final Producer producer;
 
     public PokemonDTO create(PokemonCreateDTO pokemonCreateDTO) throws RegraDeNegocioException {
         if (somaStatus(pokemonCreateDTO) >= 580 && pokemonCreateDTO.getRegiaoDominante() == null) {
@@ -35,11 +39,11 @@ public class PokemonService {
     public List<PokemonDTO> list() {
         return pokemonRepository.findAll().stream()
                 .map(pokemon -> objectMapper.convertValue(pokemon, PokemonDTO.class))
-                .sorted(Comparator.comparing(a -> a.getNumero()))
+                .sorted(Comparator.comparing(PokemonDTO::getNumero))
                 .collect(Collectors.toList());
     }
 
-    public PokemonDTO update(Integer idPokemon, PokemonCreateDTO pokemonCreateDTO) throws RegraDeNegocioException {
+    public PokemonDTO update(Integer idPokemon, PokemonCreateDTO pokemonCreateDTO) throws RegraDeNegocioException, JsonProcessingException {
         if (somaStatus(pokemonCreateDTO) >= 580 && pokemonCreateDTO.getRegiaoDominante() == null) {
             throw new RegraDeNegocioException("deve conter região dominate, pois o pokémon é lendário");
         }
@@ -53,8 +57,9 @@ public class PokemonService {
         find.setPeso(pokemonCreateDTO.getPeso());
         find.setStatus(objectMapper.convertValue(pokemonCreateDTO.getStatus(), StatusEntity.class));
         PokemonEntity update = pokemonRepository.save(find);
-        PokemonDTO dto = objectMapper.convertValue(update,PokemonDTO.class);
-        return dto;
+        PokeDadosDTO pokeDadosDTO = pokeDadosService.list(idPokemon).get(0);
+        producer.sendUpdate(pokeDadosDTO);
+        return objectMapper.convertValue(update,PokemonDTO.class);
     }
 
     public Boolean existisSetHabilidadeRepetida(PokemonHabilidadeCreateDTO pokemonHabilidadeCreateDTO) {

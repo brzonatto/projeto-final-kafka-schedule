@@ -1,6 +1,6 @@
 package com.dbc.kafka;
 
-import com.dbc.dto.KafkaDTO;
+import com.dbc.dto.PokeDadosDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +27,8 @@ public class Producer {
     @Value(value = "${kafka.topic.update}")
     private String send;
 
-    public void sendToBox(KafkaDTO kafkaDTO) throws JsonProcessingException {
-        String payload = objectMapper.writeValueAsString(kafkaDTO);
+    public void sendUpdate(PokeDadosDTO pokeDadosDTO) throws JsonProcessingException {
+        String payload = objectMapper.writeValueAsString(pokeDadosDTO);
         Message<String> message = MessageBuilder.withPayload(payload)
                 .setHeader(KafkaHeaders.TOPIC, send)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())

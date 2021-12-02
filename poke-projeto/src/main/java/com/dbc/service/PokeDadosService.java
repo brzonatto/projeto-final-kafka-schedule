@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class PokeDadosService {
     private final PokemonRepository pokemonRepository;
     private final ObjectMapper objectMapper;
-    private final PokemonService pokemonService;
 
     public List<PokeDadosDTO> list(Integer idPoke) throws RegraDeNegocioException {
         List<PokeDadosDTO> listaPokemonComTodosDados = new ArrayList<>();
@@ -29,7 +28,7 @@ public class PokeDadosService {
                     .sorted(Comparator.comparing(a -> a.getPokemon().getNumero()))
                     .collect(Collectors.toList());
         }
-        PokemonEntity pokemonEntity = pokemonService.findById(idPoke);
+        PokemonEntity pokemonEntity = pokemonRepository.findById(idPoke).orElseThrow(() -> new RegraDeNegocioException("Pokemon não encontrado"));
         listaPokemonComTodosDados.add(setPokeDadosDTO(pokemonEntity));
         return listaPokemonComTodosDados;
     }

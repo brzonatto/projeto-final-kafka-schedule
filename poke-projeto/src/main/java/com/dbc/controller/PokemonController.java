@@ -6,6 +6,7 @@ import com.dbc.dto.PokemonHabilidadeCreateDTO;
 import com.dbc.dto.PokemonHabilidadeDTO;
 import com.dbc.exceptions.RegraDeNegocioException;
 import com.dbc.service.PokemonService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -52,7 +53,7 @@ public class PokemonController {
     })
     @PutMapping("/{idPokemon}")
     public PokemonDTO update(@PathVariable("idPokemon") Integer id,
-                             @RequestBody @Valid PokemonCreateDTO pokemonCreateDTO) throws RegraDeNegocioException{
+                             @RequestBody @Valid PokemonCreateDTO pokemonCreateDTO) throws RegraDeNegocioException, JsonProcessingException {
         return pokemonService.update(id, pokemonCreateDTO);
     }
 
