@@ -3,6 +3,7 @@ package br.com.dbc.pokedex.service;
 import br.com.dbc.pokedex.client.PokeProjetoClient;
 import br.com.dbc.pokedex.dto.*;
 import br.com.dbc.pokedex.entity.PokedexEntity;
+import br.com.dbc.pokedex.entity.ResumoEntity;
 import br.com.dbc.pokedex.entity.TreinadorEntity;
 import br.com.dbc.pokedex.exceptions.RegraDeNegocioException;
 import br.com.dbc.pokedex.repository.PokedexRepository;
@@ -144,4 +145,6 @@ public class PokedexService {
         pokedexDadosDTO.setPokedex(pokedexDTO);
         return pokedexDadosDTO;
     }
+
+
 }
