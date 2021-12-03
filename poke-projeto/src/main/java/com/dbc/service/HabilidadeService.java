@@ -18,9 +18,8 @@ public class HabilidadeService {
     private final ObjectMapper objectMapper;
 
     private HabilidadeEntity findById(Integer id) throws RegraDeNegocioException {
-        HabilidadeEntity entity = habilidadeRepository.findById(id)
+        return habilidadeRepository.findById(id)
                 .orElseThrow(() -> new RegraDeNegocioException("Não encontrado"));
-        return entity;
     }
 
     public HabilidadeDTO create(HabilidadeCreateDTO habilidadeCreateDTO) {
@@ -40,8 +39,7 @@ public class HabilidadeService {
         HabilidadeEntity entity = objectMapper.convertValue(habilidadeCreateDTO, HabilidadeEntity.class);
         entity.setIdHabilidade(idHabilidade);
         HabilidadeEntity update = habilidadeRepository.save(entity);
-        HabilidadeDTO habilidadeDTO = objectMapper.convertValue(update, HabilidadeDTO.class);
-        return habilidadeDTO;
+        return objectMapper.convertValue(update, HabilidadeDTO.class);
     }
 
     public void delete(Integer idHabilidade) throws RegraDeNegocioException{

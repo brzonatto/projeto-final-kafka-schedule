@@ -70,7 +70,7 @@ public class PokemonController {
 
 
    @PostMapping("/{idPokemon}/add-habilidade")
-    public PokemonHabilidadeDTO addHabilidade(@PathVariable("idPokemon") Integer idPokemon, @RequestBody @Valid PokemonHabilidadeCreateDTO pokemonHabilidadeCreateDTO) throws RegraDeNegocioException {
+    public PokemonHabilidadeDTO addHabilidade(@PathVariable("idPokemon") Integer idPokemon, @RequestBody @Valid PokemonHabilidadeCreateDTO pokemonHabilidadeCreateDTO) throws RegraDeNegocioException, JsonProcessingException {
         return pokemonService.setHabilidades(idPokemon, pokemonHabilidadeCreateDTO);
    }
 }

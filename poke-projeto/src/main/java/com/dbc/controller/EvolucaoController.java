@@ -4,6 +4,7 @@ import com.dbc.dto.EvolucaoCreateDTO;
 import com.dbc.dto.EvolucaoDTO;
 import com.dbc.exceptions.RegraDeNegocioException;
 import com.dbc.service.EvolucaoService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -30,7 +31,7 @@ public class EvolucaoController {
             @ApiResponse(code = 400, message = "Evolução com dados inconsistentes"),
             @ApiResponse(code = 500, message = "Excessão no sistema")
     })
-    public EvolucaoDTO create(@RequestBody @Valid EvolucaoCreateDTO evolucaoCreateDTO) throws RegraDeNegocioException {
+    public EvolucaoDTO create(@RequestBody @Valid EvolucaoCreateDTO evolucaoCreateDTO) throws RegraDeNegocioException, JsonProcessingException {
         EvolucaoDTO evolucaoDTOCriado = evolucaoService.create(evolucaoCreateDTO);
         return evolucaoDTOCriado;
     }
@@ -48,7 +49,7 @@ public class EvolucaoController {
             @ApiResponse(code = 400, message = "Evolução não encontrada"),
             @ApiResponse(code = 500, message = "Excessão no sistema")
     })
-    public EvolucaoDTO update(@PathVariable("idEvolucao") Integer idEvolucao, @RequestBody @Valid EvolucaoCreateDTO evolucaoCreateDTO) throws RegraDeNegocioException {
+    public EvolucaoDTO update(@PathVariable("idEvolucao") Integer idEvolucao, @RequestBody @Valid EvolucaoCreateDTO evolucaoCreateDTO) throws RegraDeNegocioException, JsonProcessingException {
         return evolucaoService.update(idEvolucao, evolucaoCreateDTO);
     }
 

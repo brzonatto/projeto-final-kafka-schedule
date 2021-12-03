@@ -5,6 +5,7 @@ import com.dbc.dto.TipoPokemonDTO;
 import com.dbc.enums.Tipo;
 import com.dbc.exceptions.RegraDeNegocioException;
 import com.dbc.service.TipoPokemonService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -32,7 +33,7 @@ public class TipoPokemonController {
             @ApiResponse(code = 400, message = "Tipo com dados inconsistentes"),
             @ApiResponse(code = 500, message = "Excessão no sistema")
     })
-    public TipoPokemonDTO create(@PathVariable("idPokemon") Integer idPokemon, @RequestParam @Valid Tipo tipo) throws RegraDeNegocioException {
+    public TipoPokemonDTO create(@PathVariable("idPokemon") Integer idPokemon, @RequestParam @Valid Tipo tipo) throws RegraDeNegocioException, JsonProcessingException {
         TipoPokemonDTO tipoPokemonDTOCriado = tipoPokemonService.create(idPokemon, tipo);
         return tipoPokemonDTOCriado;
     }
@@ -50,7 +51,7 @@ public class TipoPokemonController {
             @ApiResponse(code = 400, message = "Tipo não encontrado"),
             @ApiResponse(code = 500, message = "Excessão no sistema")
     })
-    public TipoPokemonDTO update(@PathVariable("idTipo") Integer idTipo, @RequestParam @NotNull Tipo tipo) throws RegraDeNegocioException {
+    public TipoPokemonDTO update(@PathVariable("idTipo") Integer idTipo, @RequestParam @NotNull Tipo tipo) throws RegraDeNegocioException, JsonProcessingException {
         return tipoPokemonService.update(idTipo, tipo);
     }
 
@@ -61,7 +62,7 @@ public class TipoPokemonController {
             @ApiResponse(code = 400, message = "Tipo não encontrado"),
             @ApiResponse(code = 500, message = "Excessão no sistema")
     })
-    public void delete(@PathVariable("idTipo") Integer idTipo) throws RegraDeNegocioException {
+    public void delete(@PathVariable("idTipo") Integer idTipo) throws RegraDeNegocioException, JsonProcessingException {
         tipoPokemonService.delete(idTipo);
     }
 }

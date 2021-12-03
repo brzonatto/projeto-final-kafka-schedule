@@ -24,33 +24,30 @@ public class Producer {
     private final KafkaTemplate<String, String> stringKafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value(value = "${kafka.topic.update}")
-    private String send;
+    @Value(value = "${kafka.topic.updatePokeDados}")
+    private String updatePokeDados;
+
+    @Value(value = "${kafka.topic.updateTotalPokemons}")
+    private String updateTotalPokemons;
 
     public void sendUpdate(PokeDadosDTO pokeDadosDTO) throws JsonProcessingException {
         String payload = objectMapper.writeValueAsString(pokeDadosDTO);
         Message<String> message = MessageBuilder.withPayload(payload)
-                .setHeader(KafkaHeaders.TOPIC, send)
+                .setHeader(KafkaHeaders.TOPIC, updatePokeDados)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
                 .build();
-        ListenableFuture<SendResult<String, String>> send = stringKafkaTemplate.send(message);
-        send.addCallback(new ListenableFutureCallback<>() {
-            @Override
-            public void onFailure(Throwable ex) {
-                log.error("Erro ao enviar o update!");
-            }
-            @Override
-            public void onSuccess(SendResult<String, String> result) {
-                log.info("Update enviado!");
-            }
-        });
+        callBack(message);
     }
 
     public void sendUpdateTotalPokemons(Integer total) {
         Message<String> message = MessageBuilder.withPayload(total.toString())
-                .setHeader(KafkaHeaders.TOPIC, send)
+                .setHeader(KafkaHeaders.TOPIC, updateTotalPokemons)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
                 .build();
+        callBack(message);
+    }
+
+    public void callBack(Message<String> message) {
         ListenableFuture<SendResult<String, String>> send = stringKafkaTemplate.send(message);
         send.addCallback(new ListenableFutureCallback<>() {
             @Override

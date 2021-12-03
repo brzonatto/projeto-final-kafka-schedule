@@ -32,8 +32,8 @@ public class PokemonService {
         }
         PokemonEntity pokemonEntity = objectMapper.convertValue(pokemonCreateDTO, PokemonEntity.class);
         PokemonEntity pokemonCriado = pokemonRepository.save(pokemonEntity);
-        PokemonDTO pokemonDTO = objectMapper.convertValue(pokemonCriado, PokemonDTO.class);
-        return pokemonDTO;
+        producer.sendUpdateTotalPokemons(pokemonRepository.countTotalPokemons());
+        return objectMapper.convertValue(pokemonCriado, PokemonDTO.class);
     }
 
     public List<PokemonDTO> list() {
@@ -73,7 +73,7 @@ public class PokemonService {
         return false;
     }
 
-    public PokemonHabilidadeDTO setHabilidades(Integer idPokemon, PokemonHabilidadeCreateDTO pokemonHabilidadeCreateDTO) throws RegraDeNegocioException {
+    public PokemonHabilidadeDTO setHabilidades(Integer idPokemon, PokemonHabilidadeCreateDTO pokemonHabilidadeCreateDTO) throws RegraDeNegocioException, JsonProcessingException {
         if (existisSetHabilidadeRepetida(pokemonHabilidadeCreateDTO)) {
             throw new RegraDeNegocioException("não deve existir habilidades repetidas para o mesmo pokemon");
         }
@@ -94,6 +94,8 @@ public class PokemonService {
                         .map(habilidade -> objectMapper.convertValue(habilidade, HabilidadeDTO.class))
                         .collect(Collectors.toList())
         );
+        PokeDadosDTO pokeDadosDTO = pokeDadosService.list(idPokemon).get(0);
+        producer.sendUpdate(pokeDadosDTO);
         return pokemonHabilidadeDTO;
     }
 

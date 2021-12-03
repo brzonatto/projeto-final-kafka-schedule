@@ -4,8 +4,10 @@ import com.dbc.dto.*;
 import com.dbc.entity.EvolucaoEntity;
 import com.dbc.entity.PokemonEntity;
 import com.dbc.exceptions.RegraDeNegocioException;
+import com.dbc.kafka.Producer;
 import com.dbc.repository.EvolucaoRepository;
 import com.dbc.repository.PokemonRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,11 +22,13 @@ public class EvolucaoService {
     private final EvolucaoRepository evolucaoRepository;
     private final PokemonRepository pokemonRepository;
     private final ObjectMapper objectMapper;
+    private final Producer producer;
+    private final PokeDadosService pokeDadosService;
+
 
     private EvolucaoEntity findById(Integer id) throws RegraDeNegocioException {
-        EvolucaoEntity entity = evolucaoRepository.findById(id)
+        return evolucaoRepository.findById(id)
                 .orElseThrow(() -> new RegraDeNegocioException("Não encontrado"));
-        return entity;
     }
 
     public Boolean existPokemonNaEvolucao(EvolucaoEntity evolucaoEntity) {
@@ -50,7 +54,7 @@ public class EvolucaoService {
         return pokemon1.equals(pokemon2) || pokemon1.equals(pokemon3) || pokemon2.equals(pokemon3);
     }
 
-    public EvolucaoDTO create(EvolucaoCreateDTO evolucaoCreateDTO) throws RegraDeNegocioException {
+    public EvolucaoDTO create(EvolucaoCreateDTO evolucaoCreateDTO) throws RegraDeNegocioException, JsonProcessingException {
         PokemonEntity estagioUm = pokemonRepository.findById(evolucaoCreateDTO.getIdEstagioUm()).orElseThrow(() -> new RegraDeNegocioException("Estágio 1 não encontrado"));
         PokemonEntity estagioDois = pokemonRepository.findById(evolucaoCreateDTO.getIdEstagioDois()).orElseThrow(() -> new RegraDeNegocioException("Estágio 2 não encontrado"));
         PokemonEntity estagioTres = null;
@@ -90,13 +94,24 @@ public class EvolucaoService {
         evolucaoDTO.setEstagioUm(objectMapper.convertValue(updateEstagioUm, PokemonDTO.class));
         evolucaoDTO.setEstagioDois(objectMapper.convertValue(updateEstagioDois, PokemonDTO.class));
         evolucaoDTO.setEstagioTres(objectMapper.convertValue(updateEstagioTres, PokemonDTO.class));
+
+        List<PokeDadosDTO> pokeDados = new ArrayList<>();
+        pokeDados.add(pokeDadosService.list(updateEstagioUm.getIdPokemon()).get(0));
+        pokeDados.add(pokeDadosService.list(updateEstagioDois.getIdPokemon()).get(0));
+        if (updateEstagioTres != null) {
+            pokeDados.add(pokeDadosService.list(updateEstagioTres.getIdPokemon()).get(0));
+        }
+        for (PokeDadosDTO key : pokeDados) {
+            producer.sendUpdate(key);
+        }
+
         return evolucaoDTO;
     }
 
     public List<EvolucaoDTO> list() {
-        List<EvolucaoEntity> evolucoes = evolucaoRepository.findAll().stream().collect(Collectors.toList());
+        List<EvolucaoEntity> evolucoes = new ArrayList<>(evolucaoRepository.findAll());
 
-        List<EvolucaoDTO> evolucaosShow = evolucoes.stream()
+        return evolucoes.stream()
                 .map(evolucaoEntity -> {
                     EvolucaoDTO evolucaoDTO = objectMapper.convertValue(evolucaoEntity, EvolucaoDTO.class);
                     evolucaoDTO.setEstagioUm(objectMapper.convertValue(evolucaoEntity.getEstagioUm(), PokemonDTO.class));
@@ -105,10 +120,9 @@ public class EvolucaoService {
                     return evolucaoDTO;
                 })
                 .collect(Collectors.toList());
-        return evolucaosShow;
     }
 
-    public EvolucaoDTO update(Integer idEvolucao, EvolucaoCreateDTO evolucaoCreateDTO) throws RegraDeNegocioException {
+    public EvolucaoDTO update(Integer idEvolucao, EvolucaoCreateDTO evolucaoCreateDTO) throws RegraDeNegocioException, JsonProcessingException {
         EvolucaoEntity compare = new EvolucaoEntity();
         compare.setEstagioUm(pokemonRepository.findById(evolucaoCreateDTO.getIdEstagioUm()).orElseThrow(() -> new RegraDeNegocioException("Estágio 1 não encontrado")));
         compare.setEstagioDois(pokemonRepository.findById(evolucaoCreateDTO.getIdEstagioDois()).orElseThrow(() -> new RegraDeNegocioException("Estágio 2 não encontrado")));
@@ -144,10 +158,21 @@ public class EvolucaoService {
         evolucaoDTO.setEstagioUm(objectMapper.convertValue(update.getEstagioUm(), PokemonDTO.class));
         evolucaoDTO.setEstagioDois(objectMapper.convertValue(update.getEstagioDois(), PokemonDTO.class));
         evolucaoDTO.setEstagioTres(objectMapper.convertValue(update.getEstagioTres(), PokemonDTO.class));
+
+        List<PokeDadosDTO> pokeDados = new ArrayList<>();
+        pokeDados.add(pokeDadosService.list(evolucaoDTO.getEstagioUm().getIdPokemon()).get(0));
+        pokeDados.add(pokeDadosService.list(evolucaoDTO.getEstagioDois().getIdPokemon()).get(0));
+        if (evolucaoDTO.getEstagioTres() != null) {
+            pokeDados.add(pokeDadosService.list(evolucaoDTO.getEstagioTres().getIdPokemon()).get(0));
+        }
+        for (PokeDadosDTO key : pokeDados) {
+            producer.sendUpdate(key);
+        }
+
         return evolucaoDTO;
     }
 
-    public void delete(Integer idEvolucao) throws RegraDeNegocioException {
+    public void delete(Integer idEvolucao) throws RegraDeNegocioException, JsonProcessingException {
         List<PokemonEntity> list = new ArrayList<>();
         EvolucaoEntity entity = findById(idEvolucao);
         PokemonEntity updateUm = pokemonRepository.findById(entity.getEstagioUm().getIdPokemon()).orElseThrow(() -> new RegraDeNegocioException("Estágio 1 não encontrado"));
@@ -161,7 +186,13 @@ public class EvolucaoService {
             updateTres.setEvolucaoEntity(null);
             list.add(updateTres);
         }
-        pokemonRepository.saveAll(list);
+        List<PokemonEntity> listPokeSaves = pokemonRepository.saveAll(list);
+
+        for (PokemonEntity key : listPokeSaves) {
+            PokeDadosDTO pokeDadosDTO = pokeDadosService.list(key.getIdPokemon()).get(0);
+            producer.sendUpdate(pokeDadosDTO);
+        }
+
         evolucaoRepository.delete(entity);
     }
 
