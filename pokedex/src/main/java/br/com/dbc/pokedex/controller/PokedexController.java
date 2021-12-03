@@ -47,7 +47,7 @@ public class PokedexController {
     }
 
     @GetMapping("/dados")
-    public PokedexDadosDTO getDadosPokedex(@RequestParam String idTreinador, @RequestHeader("Authorization") String authorizationHeader) throws RegraDeNegocioException {
-        return pokedexService.getDadosPokedex(idTreinador, authorizationHeader);
+    public PokedexDadosDTO getDadosPokedex(@RequestParam String idTreinador) throws RegraDeNegocioException {
+        return pokedexService.getDadosPokedex(idTreinador);
     }
 }

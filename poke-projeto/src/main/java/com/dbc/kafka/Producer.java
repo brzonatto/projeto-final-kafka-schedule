@@ -27,22 +27,21 @@ public class Producer {
     @Value(value = "${kafka.topic.updatePokeDados}")
     private String updatePokeDados;
 
-    @Value(value = "${kafka.topic.updateTotalPokemons}")
-    private String updateTotalPokemons;
-
     public void sendUpdate(PokeDadosDTO pokeDadosDTO) throws JsonProcessingException {
         String payload = objectMapper.writeValueAsString(pokeDadosDTO);
         Message<String> message = MessageBuilder.withPayload(payload)
                 .setHeader(KafkaHeaders.TOPIC, updatePokeDados)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
+                .setHeader(KafkaHeaders.PARTITION_ID, 0)
                 .build();
         callBack(message);
     }
 
     public void sendUpdateTotalPokemons(Integer total) {
         Message<String> message = MessageBuilder.withPayload(total.toString())
-                .setHeader(KafkaHeaders.TOPIC, updateTotalPokemons)
+                .setHeader(KafkaHeaders.TOPIC, updatePokeDados)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
+                .setHeader(KafkaHeaders.PARTITION_ID, 1)
                 .build();
         callBack(message);
     }

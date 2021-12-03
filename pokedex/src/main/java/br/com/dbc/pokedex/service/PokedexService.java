@@ -15,7 +15,6 @@ import org.bson.Document;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,6 +61,15 @@ public class PokedexService {
         return objectMapper.convertValue(create, PokedexDTO.class);
     }
 
+    public void updateAllTotalPokemons(Integer totalPokemons) {
+        List<TreinadorEntity> treinadores = treinadorRepository.findAll();
+        for (TreinadorEntity key : treinadores) {
+            PokedexEntity pokedex = key.getPokedexEntity();
+            pokedex.setQuantidadeDePokemonsExistentes(totalPokemons);
+            pokedexRepository.save(pokedex);
+        }
+    }
+
     public List<PokeDadosDTO> listPokemonDadosDTO(String authorizationHeader) {
         return listPokeDados(authorizationHeader)
                 .stream()
@@ -74,7 +82,7 @@ public class PokedexService {
                     List<String> tipos = new ArrayList<>();
                     if (docTipo.size() != 0) {
                         for (int i = 0; i < docTipo.size(); i++) {
-                            String string = docTipo.get(i).toString().replaceAll("\\{tipo=|}", ""); // ["{tipo=AGUA}", "{tipo=VOADOR}"] = ["AGUA", "VOADOR"]
+                            String string = docTipo.get(i).toString().replaceAll("\\{tipo=|}", "");
                             tipos.add(string);
                         }
                     }
@@ -106,7 +114,7 @@ public class PokedexService {
     }
 
 
-    public PokedexDTO revelarPokemon(Integer numeroPokemon, String idTreinador, String authorizationHeader) throws RegraDeNegocioException {
+    public PokedexDTO revelarPokemon(Integer numeroPokemon, String idTreinador, String authorizationHeader) throws RegraDeNegocioException { //TODO EMAIL AO REVELAR
         TreinadorEntity treinadorEntity = treinadorService.getTreinadorById(idTreinador);
         PokedexEntity pokedexEntity = getPokedexById(treinadorEntity.getPokedexEntity().getIdPokedex());
         List<PokeDadosDTO> pokemons = pokedexEntity.getPokemons();
@@ -138,25 +146,11 @@ public class PokedexService {
         return pokedexDTO;
     }
 
-    public PokedexDadosDTO getDadosPokedex(String idTreinador, String authorizationHeader) throws RegraDeNegocioException {
+    public PokedexDadosDTO getDadosPokedex(String idTreinador) throws RegraDeNegocioException {
         TreinadorEntity treinadorEntity = treinadorService.getTreinadorById(idTreinador);
         TreinadorDTO treinadorDTO = objectMapper.convertValue(treinadorEntity, TreinadorDTO.class);
         PokedexEntity pokedexEntity = getPokedexById(treinadorEntity.getPokedexEntity().getIdPokedex());
-        pokedexEntity.setQuantidadeDePokemonsExistentes(countTotalPokemons(authorizationHeader));
-        List<Integer> base = pokedexEntity.getPokemons()
-                .stream()
-                .map(pokemon -> pokemon.getPokemon().getNumero())
-                .collect(Collectors.toList());
-        List<PokeDadosDTO> pokeDadosUpdate = new ArrayList<>();
-        for (int i = 0; i < base.size(); i++) {
-            pokeDadosUpdate.add(getPokeDadosByNumero(base.get(i), authorizationHeader));
-        }
-        pokedexEntity.setPokemons(
-                pokeDadosUpdate.stream()
-                        .sorted(Comparator.comparing(a -> a.getPokemon().getNumero())).collect(Collectors.toList())
-        );
-        PokedexEntity pokedexUpdate = pokedexRepository.save(pokedexEntity);
-        PokedexDTO pokedexDTO = objectMapper.convertValue(pokedexUpdate, PokedexDTO.class);
+        PokedexDTO pokedexDTO = objectMapper.convertValue(pokedexEntity, PokedexDTO.class);
         PokedexDadosDTO pokedexDadosDTO = new PokedexDadosDTO();
         pokedexDadosDTO.setTreinador(treinadorDTO);
         pokedexDadosDTO.setPokedex(pokedexDTO);

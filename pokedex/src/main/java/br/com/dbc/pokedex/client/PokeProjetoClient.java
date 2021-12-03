@@ -10,7 +10,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 
 import java.util.List;
 
-@FeignClient(value = "poke-projeto", url = "https://poke-projeto-vemser.herokuapp.com")
+@FeignClient(value = "poke-projeto", url = "localhost:8080")
 @Headers({"Content-Type: application/json"})
 public interface PokeProjetoClient {
     @RequestLine("POST /auth")
