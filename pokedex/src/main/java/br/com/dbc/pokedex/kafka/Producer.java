@@ -45,4 +45,23 @@ public class Producer {
             }
         });
     }
+
+    public void sendRevelarPokemon(ResumoDTO resumoDTO) throws JsonProcessingException {
+        String payload = objectMapper.writeValueAsString(resumoDTO);
+        Message<String> message = MessageBuilder.withPayload(payload)
+                .setHeader(KafkaHeaders.TOPIC, topico)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
+                .build();
+        ListenableFuture<SendResult<String, String>> send = stringKafkaTemplate.send(message);
+        send.addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(Throwable ex) {
+                log.error(" Erro ao enviar");
+            }
+            @Override
+            public void onSuccess(SendResult<String, String> result) {
+                log.info(" Mensagem enviada para o consumer");
+            }
+        });
+    }
 }

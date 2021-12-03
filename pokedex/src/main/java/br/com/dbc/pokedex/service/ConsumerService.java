@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
@@ -37,6 +38,8 @@ public class ConsumerService {
         }
 
         if (partition == 0) {
+            Document document = objectMapper.readValue(mensagem, Document.class);
+            pokedexService.updateAllPokemons(document);
             log.info("atualizou o pokemon");
         }
 

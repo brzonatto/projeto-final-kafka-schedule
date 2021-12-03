@@ -6,6 +6,7 @@ import br.com.dbc.pokedex.entity.PokedexEntity;
 import br.com.dbc.pokedex.entity.ResumoEntity;
 import br.com.dbc.pokedex.entity.TreinadorEntity;
 import br.com.dbc.pokedex.exceptions.RegraDeNegocioException;
+import br.com.dbc.pokedex.kafka.Producer;
 import br.com.dbc.pokedex.repository.PokedexRepository;
 import br.com.dbc.pokedex.repository.ResumoRepository;
 import br.com.dbc.pokedex.repository.TreinadorRepository;
@@ -29,6 +30,7 @@ public class PokedexService {
     private final TreinadorRepository treinadorRepository;
     private final ResumoService resumoService;
     private final ResumoRepository resumoRepository;
+    private final Producer producer;
 
     public String auth(LoginDTO loginDTO) {
         return pokeProjetoClient.auth(loginDTO);
@@ -106,7 +108,7 @@ public class PokedexService {
     }
 
     public PokeDadosDTO getPokeDadosByNumero(Integer numeroPokemon, String authorizationHeader) throws RegraDeNegocioException {
-       return listPokemonDadosDTO(authorizationHeader)
+        return listPokemonDadosDTO(authorizationHeader)
                 .stream()
                 .filter(poke -> poke.getPokemon().getNumero().equals(numeroPokemon))
                 .findFirst()
@@ -119,16 +121,15 @@ public class PokedexService {
         PokedexEntity pokedexEntity = getPokedexById(treinadorEntity.getPokedexEntity().getIdPokedex());
         List<PokeDadosDTO> pokemons = pokedexEntity.getPokemons();
         PokeDadosDTO pokeDadosDTO = getPokeDadosByNumero(numeroPokemon, authorizationHeader);
-        List<NumeroNomeDTO> pokemonsReveladosHoje = new ArrayList<>();
-        NumeroNomeDTO numeroNomeDTO = new NumeroNomeDTO(pokeDadosDTO.getPokemon().getNumero(), pokeDadosDTO.getPokemon().getNome(), treinadorEntity);
-        ResumoDTO resumoDTO = new ResumoDTO(LocalDate.now(),1, 1, pokemonsReveladosHoje);
-        if(!pokemons.contains(pokeDadosDTO)){
-
-            if (!pokemonsReveladosHoje.contains(numeroNomeDTO.getTreinadorEntity())) {
-                resumoDTO.setTotalTreinadores(+1);
-            }
-            resumoDTO.setTotalPokemons(+1);
-            pokemonsReveladosHoje.add(numeroNomeDTO);
+//        List<NumeroNomeDTO> pokemonsReveladosHoje = new ArrayList<>();
+//        NumeroNomeDTO numeroNomeDTO = new NumeroNomeDTO(pokeDadosDTO.getPokemon().getNumero(), pokeDadosDTO.getPokemon().getNome(), treinadorEntity);
+//        ResumoDTO resumoDTO = new ResumoDTO(LocalDate.now(), 1, 1, pokemonsReveladosHoje);
+        if (!pokemons.contains(pokeDadosDTO)) {
+//            if (!pokemonsReveladosHoje.contains(numeroNomeDTO.getTreinadorEntity())) {
+//                resumoDTO.setTotalTreinadores(+1);
+//            }
+//            resumoDTO.setTotalPokemons(+1);
+//            pokemonsReveladosHoje.add(numeroNomeDTO);
             pokemons.add(pokeDadosDTO);
         } else {
             throw new RegraDeNegocioException("Pokemon já revelado");
@@ -140,10 +141,11 @@ public class PokedexService {
         pokedexEntity.setQuantidadePokemonsRevelados(pokemons.size());
 
         PokedexEntity pokedexUpdate = pokedexRepository.save(pokedexEntity);
-        ResumoEntity resumoEntity = objectMapper.convertValue(resumoDTO, ResumoEntity.class);
-        resumoRepository.save(resumoEntity);
-        PokedexDTO pokedexDTO = objectMapper.convertValue(pokedexUpdate, PokedexDTO.class);
-        return pokedexDTO;
+//        ResumoEntity resumoEntity = objectMapper.convertValue(resumoDTO, ResumoEntity.class);
+//        resumoRepository.save(resumoEntity);
+
+        producer.sendMessage();
+        return objectMapper.convertValue(pokedexUpdate, PokedexDTO.class);
     }
 
     public PokedexDadosDTO getDadosPokedex(String idTreinador) throws RegraDeNegocioException {
@@ -158,4 +160,39 @@ public class PokedexService {
     }
 
 
+    public void updateAllPokemons(Document document) {
+        Document docPokemon = objectMapper.convertValue(document.get("pokemon"), Document.class);
+        PokemonDTO pokemonDTO = objectMapper.convertValue(docPokemon, PokemonDTO.class);
+        Integer nPokemon = pokemonDTO.getNumero();
+        List<PokedexEntity> pokedexes = pokedexRepository.searchPokedexWithPokemon(nPokemon);
+        for (PokedexEntity key : pokedexes) {
+            PokeDadosDTO delete = key.getPokemons().stream().filter(pokemon -> pokemon.getPokemon().getNumero().equals(nPokemon)).findFirst().orElseThrow();
+            key.getPokemons().remove(delete);
+            PokeDadosDTO update = new PokeDadosDTO();
+            update.setPokemon(pokemonDTO);
+            List docTipo = document.get("tipos", List.class);
+            List<String> tipos = new ArrayList<>();
+            if (docTipo.size() != 0) {
+                for (int i = 0; i < docTipo.size(); i++) {
+                    String string = docTipo.get(i).toString().replaceAll("\\{tipo=|}", "");
+                    tipos.add(string);
+                }
+            }
+            update.setTipos(tipos);
+            List docHabilidade = document.get("habilidades", List.class);
+            List<String> habilidades = new ArrayList<>();
+            if (docHabilidade.size() != 0) {
+                for (int i = 0; i < docHabilidade.size(); i++) {
+                    Document doc = objectMapper.convertValue(docHabilidade.get(i), Document.class);
+                    habilidades.add(objectMapper.convertValue(doc.get("nome"), String.class));
+                }
+            }
+            update.setHabilidades(habilidades);
+            Document docEvolucao = objectMapper.convertValue(document.get("evolucao"), Document.class);
+            EvolucaoNomesDTO evolucaoNomesDTO = objectMapper.convertValue(docEvolucao, EvolucaoNomesDTO.class);
+            update.setEvolucao(evolucaoNomesDTO);
+            key.getPokemons().add(update);
+            pokedexRepository.save(key);
+        }
+    }
 }
