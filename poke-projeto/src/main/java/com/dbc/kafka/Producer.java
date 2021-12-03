@@ -37,11 +37,29 @@ public class Producer {
         send.addCallback(new ListenableFutureCallback<>() {
             @Override
             public void onFailure(Throwable ex) {
-                log.error("Erro ao enviar!");
+                log.error("Erro ao enviar o update!");
             }
             @Override
             public void onSuccess(SendResult<String, String> result) {
-                log.info("Enviado para caixa de saída");
+                log.info("Update enviado!");
+            }
+        });
+    }
+
+    public void sendUpdateTotalPokemons(Integer total) {
+        Message<String> message = MessageBuilder.withPayload(total.toString())
+                .setHeader(KafkaHeaders.TOPIC, send)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
+                .build();
+        ListenableFuture<SendResult<String, String>> send = stringKafkaTemplate.send(message);
+        send.addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(Throwable ex) {
+                log.error("Erro ao enviar o update!");
+            }
+            @Override
+            public void onSuccess(SendResult<String, String> result) {
+                log.info("Update enviado!");
             }
         });
     }
