@@ -7,12 +7,15 @@ import br.com.dbc.pokedex.entity.ResumoEntity;
 import br.com.dbc.pokedex.entity.TreinadorEntity;
 import br.com.dbc.pokedex.exceptions.RegraDeNegocioException;
 import br.com.dbc.pokedex.repository.PokedexRepository;
+import br.com.dbc.pokedex.repository.ResumoRepository;
 import br.com.dbc.pokedex.repository.TreinadorRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,8 @@ public class PokedexService {
     private final PokedexRepository pokedexRepository;
     private final TreinadorService treinadorService;
     private final TreinadorRepository treinadorRepository;
+    private final ResumoService resumoService;
+    private final ResumoRepository resumoRepository;
 
     public String auth(LoginDTO loginDTO) {
         return pokeProjetoClient.auth(loginDTO);
@@ -106,7 +111,16 @@ public class PokedexService {
         PokedexEntity pokedexEntity = getPokedexById(treinadorEntity.getPokedexEntity().getIdPokedex());
         List<PokeDadosDTO> pokemons = pokedexEntity.getPokemons();
         PokeDadosDTO pokeDadosDTO = getPokeDadosByNumero(numeroPokemon, authorizationHeader);
+        List<NumeroNomeDTO> pokemonsReveladosHoje = new ArrayList<>();
+        NumeroNomeDTO numeroNomeDTO = new NumeroNomeDTO(pokeDadosDTO.getPokemon().getNumero(), pokeDadosDTO.getPokemon().getNome(), treinadorEntity);
+        ResumoDTO resumoDTO = new ResumoDTO(LocalDate.now(),1, 1, pokemonsReveladosHoje);
         if(!pokemons.contains(pokeDadosDTO)){
+
+            if (!pokemonsReveladosHoje.contains(numeroNomeDTO.getTreinadorEntity())) {
+                resumoDTO.setTotalTreinadores(+1);
+            }
+            resumoDTO.setTotalPokemons(+1);
+            pokemonsReveladosHoje.add(numeroNomeDTO);
             pokemons.add(pokeDadosDTO);
         } else {
             throw new RegraDeNegocioException("Pokemon já revelado");
@@ -116,7 +130,10 @@ public class PokedexService {
                         .sorted(Comparator.comparing(a -> a.getPokemon().getNumero())).collect(Collectors.toList())
         );
         pokedexEntity.setQuantidadePokemonsRevelados(pokemons.size());
+
         PokedexEntity pokedexUpdate = pokedexRepository.save(pokedexEntity);
+        ResumoEntity resumoEntity = objectMapper.convertValue(resumoDTO, ResumoEntity.class);
+        resumoRepository.save(resumoEntity);
         PokedexDTO pokedexDTO = objectMapper.convertValue(pokedexUpdate, PokedexDTO.class);
         return pokedexDTO;
     }
