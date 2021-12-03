@@ -99,7 +99,7 @@ public class PokemonService {
         return pokemonHabilidadeDTO;
     }
 
-    public void delete(Integer idPokemon) throws RegraDeNegocioException {
+    public void delete(Integer idPokemon) throws RegraDeNegocioException, JsonProcessingException {
         PokemonEntity find = findById(idPokemon);
         if (find.getEvolucaoEntity() != null) {
             evolucaoService.delete(find.getEvolucaoEntity().getIdEvolucao());

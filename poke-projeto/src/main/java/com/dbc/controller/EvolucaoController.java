@@ -60,7 +60,7 @@ public class EvolucaoController {
             @ApiResponse(code = 400, message = "Evolução não encontrada"),
             @ApiResponse(code = 500, message = "Excessão no sistema")
     })
-    public void delete(@PathVariable("idEvolucao") Integer idEvolucao) throws RegraDeNegocioException {
+    public void delete(@PathVariable("idEvolucao") Integer idEvolucao) throws RegraDeNegocioException, JsonProcessingException {
         evolucaoService.delete(idEvolucao);
     }
 
