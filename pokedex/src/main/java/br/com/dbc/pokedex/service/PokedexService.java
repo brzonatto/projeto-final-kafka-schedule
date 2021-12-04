@@ -3,12 +3,10 @@ package br.com.dbc.pokedex.service;
 import br.com.dbc.pokedex.client.PokeProjetoClient;
 import br.com.dbc.pokedex.dto.*;
 import br.com.dbc.pokedex.entity.PokedexEntity;
-import br.com.dbc.pokedex.entity.ResumoEntity;
 import br.com.dbc.pokedex.entity.TreinadorEntity;
 import br.com.dbc.pokedex.exceptions.RegraDeNegocioException;
 import br.com.dbc.pokedex.kafka.Producer;
 import br.com.dbc.pokedex.repository.PokedexRepository;
-import br.com.dbc.pokedex.repository.ResumoRepository;
 import br.com.dbc.pokedex.repository.TreinadorRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -30,8 +26,6 @@ public class PokedexService {
     private final PokedexRepository pokedexRepository;
     private final TreinadorService treinadorService;
     private final TreinadorRepository treinadorRepository;
-    private final ResumoService resumoService;
-    private final ResumoRepository resumoRepository;
     private final Producer producer;
 
     public String auth(LoginDTO loginDTO) {
@@ -117,29 +111,12 @@ public class PokedexService {
                 .orElseThrow(() -> new RegraDeNegocioException("Pokemon não encontrado"));
     }
 
-//    public List<PokeDadosDTO> listaQueContemOPokemon(String numeroPoke){
-//        List<PokedexEntity> todasPokedex = pokedexRepository.findAll();
-//        PokedexEntity pokedexEntity = new PokedexEntity();
-//        Predicate predicate = pokedexEntity.getPokemons(numeroPoke);
-//        for pokedex : todasPokedex{}
-//        possui.getPokemon().equals(numeroPoke);
-//    }
-
-
-    public PokedexDTO revelarPokemon(Integer numeroPokemon, String idTreinador, String authorizationHeader) throws RegraDeNegocioException, JsonProcessingException { //TODO EMAIL AO REVELAR
+    public PokedexDTO revelarPokemon(Integer numeroPokemon, String idTreinador, String authorizationHeader) throws RegraDeNegocioException, JsonProcessingException {
         TreinadorEntity treinadorEntity = treinadorService.getTreinadorById(idTreinador);
         PokedexEntity pokedexEntity = getPokedexById(treinadorEntity.getPokedexEntity().getIdPokedex());
         List<PokeDadosDTO> pokemons = pokedexEntity.getPokemons();
         PokeDadosDTO pokeDadosDTO = getPokeDadosByNumero(numeroPokemon, authorizationHeader);
-//        List<NumeroNomeDTO> pokemonsReveladosHoje = new ArrayList<>();
-//        NumeroNomeDTO numeroNomeDTO = new NumeroNomeDTO(pokeDadosDTO.getPokemon().getNumero(), pokeDadosDTO.getPokemon().getNome(), treinadorEntity);
-//        ResumoDTO resumoDTO = new ResumoDTO(LocalDate.now(), 1, 1, pokemonsReveladosHoje);
         if (!pokemons.contains(pokeDadosDTO)) {
-//            if (!pokemonsReveladosHoje.contains(numeroNomeDTO.getTreinadorEntity())) {
-//                resumoDTO.setTotalTreinadores(+1);
-//            }
-//            resumoDTO.setTotalPokemons(+1);
-//            pokemonsReveladosHoje.add(numeroNomeDTO);
             pokemons.add(pokeDadosDTO);
         } else {
             throw new RegraDeNegocioException("Pokemon já revelado");
@@ -151,11 +128,9 @@ public class PokedexService {
         pokedexEntity.setQuantidadePokemonsRevelados(pokemons.size());
 
         PokedexEntity pokedexUpdate = pokedexRepository.save(pokedexEntity);
-//        ResumoEntity resumoEntity = objectMapper.convertValue(resumoDTO, ResumoEntity.class);
-//        resumoRepository.save(resumoEntity);
         String mensagem = "Parabéns! Você revelou um Pokémon!";
         producer.sendRevelarPokemon(new RevelarDTO(treinadorEntity.getNomeCompleto(), treinadorEntity.getEmail(),mensagem, pokeDadosDTO));
-//
+
         return objectMapper.convertValue(pokedexUpdate, PokedexDTO.class);
     }
 

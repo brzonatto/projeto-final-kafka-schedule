@@ -14,15 +14,15 @@ import org.springframework.stereotype.Component;
 public class Rotinas {
     private final ResumoService resumoService;
 
-    @Scheduled(cron = "* 0 0 * * *")
-    public void salvarResumoPokedex() {
-        resumoService.salvarResumoPokedex();
-    }
-
-    @Scheduled(cron = "* 0 8 * * *")
-    public void enviarResumoPokedex() throws JsonProcessingException {
-        resumoService.enviarResumoPokedex();
-    }
+//    @Scheduled(cron = "* 0 0 * * *")
+//    public void salvarResumoPokedex() {
+//        resumoService.salvarResumoPokedex();
+//    }
+//
+//    @Scheduled(cron = "* 0 8 * * *")
+//    public void enviarResumoPokedex() throws JsonProcessingException {
+//        resumoService.enviarResumoPokedex();
+//    }
 
 
 }

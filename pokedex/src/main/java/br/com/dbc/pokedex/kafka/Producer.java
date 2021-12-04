@@ -1,6 +1,6 @@
 package br.com.dbc.pokedex.kafka;
 
-import br.com.dbc.pokedex.dto.ResumoDTO;
+import br.com.dbc.pokedex.dto.ResumoFinalDTO;
 import br.com.dbc.pokedex.dto.RevelarDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,8 +28,8 @@ public class Producer {
     @Value(value = "${kafka.topic.send}")
     private String topico;
 
-    public void sendMessage(ResumoDTO resumoDTO) throws JsonProcessingException {
-        String payload = objectMapper.writeValueAsString(resumoDTO);
+    public void sendMessage(ResumoFinalDTO resumoFinalDTO) throws JsonProcessingException {
+        String payload = objectMapper.writeValueAsString(resumoFinalDTO);
         Message<String> message = MessageBuilder.withPayload(payload)
                 .setHeader(KafkaHeaders.TOPIC, topico)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())

@@ -11,9 +11,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResumoDTO {
+public class ResumoFinalDTO {
     private LocalDate dataResumo;
     private Integer totalTreinadores;
     private Integer totalPokemons;
+    private Integer totalPokemonsRevelados;
+    private Integer totalPokemonsReveladosHoje;
     private List<NumeroNomeDTO> pokemonsReveladosHoje;
 }

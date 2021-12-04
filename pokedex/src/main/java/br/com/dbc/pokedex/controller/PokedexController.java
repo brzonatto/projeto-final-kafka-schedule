@@ -4,6 +4,7 @@ import br.com.dbc.pokedex.dto.*;
 import br.com.dbc.pokedex.entity.PokedexEntity;
 import br.com.dbc.pokedex.exceptions.RegraDeNegocioException;
 import br.com.dbc.pokedex.service.PokedexService;
+import br.com.dbc.pokedex.service.ResumoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/pokedex")
@@ -24,6 +24,7 @@ import java.util.List;
 @Slf4j
 public class PokedexController {
     private final PokedexService pokedexService;
+    private final ResumoService resumoService;
 
     @PostMapping
     public String auth(@RequestBody @Valid LoginDTO loginDTO) {
@@ -52,5 +53,10 @@ public class PokedexController {
     @GetMapping("/dados")
     public PokedexDadosDTO getDadosPokedex(@RequestParam String idTreinador) throws RegraDeNegocioException {
         return pokedexService.getDadosPokedex(idTreinador);
+    }
+
+    @PostMapping("/save-resumo")
+    public void saveResumo() {
+        resumoService.salvarResumoPokedex();
     }
 }
