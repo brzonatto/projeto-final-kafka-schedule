@@ -10,6 +10,7 @@ import br.com.dbc.pokedex.kafka.Producer;
 import br.com.dbc.pokedex.repository.PokedexRepository;
 import br.com.dbc.pokedex.repository.ResumoRepository;
 import br.com.dbc.pokedex.repository.TreinadorRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -115,8 +117,16 @@ public class PokedexService {
                 .orElseThrow(() -> new RegraDeNegocioException("Pokemon não encontrado"));
     }
 
+//    public List<PokeDadosDTO> listaQueContemOPokemon(String numeroPoke){
+//        List<PokedexEntity> todasPokedex = pokedexRepository.findAll();
+//        PokedexEntity pokedexEntity = new PokedexEntity();
+//        Predicate predicate = pokedexEntity.getPokemons(numeroPoke);
+//        for pokedex : todasPokedex{}
+//        possui.getPokemon().equals(numeroPoke);
+//    }
 
-    public PokedexDTO revelarPokemon(Integer numeroPokemon, String idTreinador, String authorizationHeader) throws RegraDeNegocioException { //TODO EMAIL AO REVELAR
+
+    public PokedexDTO revelarPokemon(Integer numeroPokemon, String idTreinador, String authorizationHeader) throws RegraDeNegocioException, JsonProcessingException { //TODO EMAIL AO REVELAR
         TreinadorEntity treinadorEntity = treinadorService.getTreinadorById(idTreinador);
         PokedexEntity pokedexEntity = getPokedexById(treinadorEntity.getPokedexEntity().getIdPokedex());
         List<PokeDadosDTO> pokemons = pokedexEntity.getPokemons();
@@ -143,8 +153,9 @@ public class PokedexService {
         PokedexEntity pokedexUpdate = pokedexRepository.save(pokedexEntity);
 //        ResumoEntity resumoEntity = objectMapper.convertValue(resumoDTO, ResumoEntity.class);
 //        resumoRepository.save(resumoEntity);
-
-        producer.sendMessage();
+        String mensagem = "Parabéns! Você revelou um Pokémon!";
+        producer.sendRevelarPokemon(new RevelarDTO(treinadorEntity.getNomeCompleto(), treinadorEntity.getEmail(),mensagem, pokeDadosDTO));
+//
         return objectMapper.convertValue(pokedexUpdate, PokedexDTO.class);
     }
 

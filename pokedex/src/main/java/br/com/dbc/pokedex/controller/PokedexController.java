@@ -4,6 +4,7 @@ import br.com.dbc.pokedex.dto.*;
 import br.com.dbc.pokedex.entity.PokedexEntity;
 import br.com.dbc.pokedex.exceptions.RegraDeNegocioException;
 import br.com.dbc.pokedex.service.PokedexService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -44,7 +45,7 @@ public class PokedexController {
     public PokedexDTO revelarPokemon( @RequestParam("numeroPokemon") Integer numeroPokemon,
                                          @RequestParam("idTreinador") String idTreinador,
                                          @RequestHeader("Authorization") String authorizationHeader)
-            throws RegraDeNegocioException {
+            throws RegraDeNegocioException, JsonProcessingException {
         return pokedexService.revelarPokemon(numeroPokemon, idTreinador, authorizationHeader);
     }
 

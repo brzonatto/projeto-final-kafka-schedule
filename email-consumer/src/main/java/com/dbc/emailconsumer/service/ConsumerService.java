@@ -1,6 +1,7 @@
 package com.dbc.emailconsumer.service;
 
 import com.dbc.emailconsumer.dto.KafkaDTO;
+import com.dbc.emailconsumer.dto.RevelarDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateException;
@@ -26,8 +27,8 @@ public class ConsumerService {
             containerFactory = "listenerContainerFactoryEarliest"
     )
     public void consumeMensagem(@Payload String mensagem) throws IOException, MessagingException, TemplateException {
-        KafkaDTO kafkaDTO = objectMapper.readValue(mensagem, KafkaDTO.class);
-        emailService.sendEmailPessoa(kafkaDTO);
-        log.info("Mensagem enviada ao destinátario {}", kafkaDTO.getDestinatario());
+        RevelarDTO revelarDTO = objectMapper.readValue(mensagem, RevelarDTO.class);
+        emailService.sendEmailPessoa(revelarDTO);
+        log.info("Mensagem enviada ao destinátario {}", revelarDTO.getDestinatario());
     }
 }

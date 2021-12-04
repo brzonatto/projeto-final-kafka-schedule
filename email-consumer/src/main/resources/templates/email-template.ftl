@@ -17,6 +17,9 @@
                             <br> Olá ${nome},
                             <br>
                             ${message}
+                            <br><br>
+                            Nome do Pokémon: ${nomePokemon}
+                            Número do Pokémon: ${numeroPoke}
                             <br> <br>
                             Qualquer dúvida é só contatar o suporte pelo e-mail ${remetente}.
                             <br><br>
