@@ -26,42 +26,38 @@ public class Producer {
     private final ObjectMapper objectMapper;
 
     @Value(value = "${kafka.topic.send}")
-    private String topico;
+    private String send;
 
-    public void sendMessage(ResumoFinalDTO resumoFinalDTO) throws JsonProcessingException {
+    public void sendResumo(ResumoFinalDTO resumoFinalDTO) throws JsonProcessingException {
         String payload = objectMapper.writeValueAsString(resumoFinalDTO);
         Message<String> message = MessageBuilder.withPayload(payload)
-                .setHeader(KafkaHeaders.TOPIC, "outro-topico")
+                .setHeader(KafkaHeaders.TOPIC, send)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
+                .setHeader(KafkaHeaders.PARTITION_ID, 0)
                 .build();
-        ListenableFuture<SendResult<String, String>> send = stringKafkaTemplate.send(message);
-        send.addCallback(new ListenableFutureCallback<>() {
-            @Override
-            public void onFailure(Throwable ex) {
-                log.error(" Erro ao enviar");
-            }
-            @Override
-            public void onSuccess(SendResult<String, String> result) {
-                log.info(" Mensagem enviada para o consumer");
-            }
-        });
+        callBack(message);
     }
 
     public void sendRevelarPokemon(RevelarDTO revelarDTO) throws JsonProcessingException {
         String payload = objectMapper.writeValueAsString(revelarDTO);
         Message<String> message = MessageBuilder.withPayload(payload)
-                .setHeader(KafkaHeaders.TOPIC, topico)
+                .setHeader(KafkaHeaders.TOPIC, send)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
+                .setHeader(KafkaHeaders.PARTITION_ID, 1)
                 .build();
+        callBack(message);
+    }
+
+    public void callBack(Message<String> message) {
         ListenableFuture<SendResult<String, String>> send = stringKafkaTemplate.send(message);
         send.addCallback(new ListenableFutureCallback<>() {
             @Override
             public void onFailure(Throwable ex) {
-                log.error(" Erro ao enviar");
+                log.error("Erro ao enviar");
             }
             @Override
             public void onSuccess(SendResult<String, String> result) {
-                log.info(" Mensagem enviada para o consumer");
+                log.info("Mensagem enviada para o consumer!");
             }
         });
     }

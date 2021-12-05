@@ -53,38 +53,24 @@ public class ResumoService {
 
     public void enviarResumoPokedex() throws RegraDeNegocioException, JsonProcessingException {
         List<ResumoEntity> resumos = resumoRepository.findAll();
-
-
         for (ResumoEntity key : resumos) {
             ResumoFinalDTO resumoFinal = new ResumoFinalDTO();
             resumoFinal.setDataResumo(key.getDataResumo());
             resumoFinal.setTotalPokemons(key.getPokedex().getQuantidadeDePokemonsExistentes());
             resumoFinal.setTotalTreinadores(key.getTotalTreinadores());
-            resumoFinal.setTotalPokemonsRevelados(key.getPokedex().getQuantidadePokemonsRevelados());
             resumoFinal.setEmail(key.getTreinador().getEmail());
-
             TreinadorEntity treinador = treinadorRepository.findById(key.getTreinador().getIdTreinador()).orElseThrow(() -> new RegraDeNegocioException("Treinador não encontrado"));
             PokedexEntity pokedex = treinador.getPokedexEntity();
             resumoFinal.setTotalPokemonsReveladosHoje(pokedex.getQuantidadePokemonsRevelados() - key.getPokedex().getQuantidadePokemonsRevelados());
-
             List<NumeroNomeDTO> numeroNomeReveladosHoje = new ArrayList<>();
             for (PokeDadosDTO key2 : pokedex.getPokemons()) {
                 if (!key.getPokedex().getPokemons().contains(key2)) {
                     numeroNomeReveladosHoje.add(new NumeroNomeDTO(key2.getPokemon().getNumero(), key2.getPokemon().getNome()));
                 }
             }
-
             resumoFinal.setPokemonsReveladosHoje(numeroNomeReveladosHoje);
-
-
-
-
-
-            producer.sendMessage(resumoFinal);
-
+            resumoFinal.setTotalPokemonsRevelados(key.getPokedex().getQuantidadePokemonsRevelados() + numeroNomeReveladosHoje.size());
+            producer.sendResumo(resumoFinal);
         }
-
     }
-
-
 }
