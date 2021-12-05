@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class Rotinas {
     private final ResumoService resumoService;
 
-    @Scheduled(cron = "* 0 0 * * *")
+    @Scheduled(cron = "* 15 23 * * *")
     public void salvarResumoPokedex() {
         resumoService.salvarResumoPokedex();
     }
@@ -24,6 +24,4 @@ public class Rotinas {
     public void enviarResumoPokedex() throws JsonProcessingException, RegraDeNegocioException {
         resumoService.enviarResumoPokedex();
     }
-
-
 }

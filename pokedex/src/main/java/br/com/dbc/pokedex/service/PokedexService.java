@@ -132,10 +132,10 @@ public class PokedexService {
                 "<br><br>Nome do pokemon é " + pokeDadosDTO.getPokemon().getNome() +
                 " E essas são algumas de suas caracteristicas: " +
                 "<br><br>Nome: " + pokeDadosDTO.getPokemon().getNome() +
-                "<br><br>Número: " + pokeDadosDTO.getPokemon().getNumero() +
-                "<br><br>Categoria: " + pokeDadosDTO.getPokemon().getCategoria() +
-                "<br><br>Level: " + pokeDadosDTO.getPokemon().getLevel() +
-                "<br><br>Tipos: " + pokeDadosDTO.getTipos().toString();
+                "<br>Número: " + pokeDadosDTO.getPokemon().getNumero() +
+                "<br>Categoria: " + pokeDadosDTO.getPokemon().getCategoria() +
+                "<br>Level: " + pokeDadosDTO.getPokemon().getLevel() +
+                "<br>Tipos: " + pokeDadosDTO.getTipos().toString();
         producer.sendRevelarPokemon(new EmailDTO("Parabéns você revelou um novo Pokémon!" ,treinadorEntity.getNomeCompleto(), treinadorEntity.getEmail(), mensagem));
 
         return objectMapper.convertValue(pokedexUpdate, PokedexDTO.class);
