@@ -34,7 +34,7 @@ public class EmailService {
 
         helper.setFrom(remetente, "Pokedex");
         helper.setTo(emailDTO.getDestinatario());
-        helper.setSubject("Pokémon revelado!");
+        helper.setSubject(emailDTO.getAssunto());
 
         Template template = configuration.getTemplate("email-template.ftl");
         Map<String, Object> dados = new HashMap<>();
