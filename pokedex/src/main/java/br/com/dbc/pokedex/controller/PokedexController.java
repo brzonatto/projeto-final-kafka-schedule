@@ -59,4 +59,9 @@ public class PokedexController {
     public void saveResumo() {
         resumoService.salvarResumoPokedex();
     }
+
+    @PostMapping("/send-resumo")
+    public void sendResumo() throws RegraDeNegocioException, JsonProcessingException {
+        resumoService.enviarResumoPokedex();
+    }
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Setter
 @Getter
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class ResumoEntity {
     @Id
     private String idResumo;
-    private LocalDateTime dataResumo;
+    private LocalDate dataResumo;
     private Integer totalTreinadores;
     private TreinadorEntity treinador;
     private PokedexEntity pokedex;

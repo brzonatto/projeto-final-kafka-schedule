@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ResumoFinalDTO {
     private LocalDate dataResumo;
+    private String email;
     private Integer totalTreinadores;
     private Integer totalPokemons;
     private Integer totalPokemonsRevelados;
