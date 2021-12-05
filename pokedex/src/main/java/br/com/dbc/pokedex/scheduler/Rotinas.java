@@ -1,5 +1,6 @@
 package br.com.dbc.pokedex.scheduler;
 
+import br.com.dbc.pokedex.exceptions.RegraDeNegocioException;
 import br.com.dbc.pokedex.service.PokedexService;
 import br.com.dbc.pokedex.service.ResumoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,15 +15,15 @@ import org.springframework.stereotype.Component;
 public class Rotinas {
     private final ResumoService resumoService;
 
-//    @Scheduled(cron = "* 0 0 * * *")
-//    public void salvarResumoPokedex() {
-//        resumoService.salvarResumoPokedex();
-//    }
-//
-//    @Scheduled(cron = "* 0 8 * * *")
-//    public void enviarResumoPokedex() throws JsonProcessingException {
-//        resumoService.enviarResumoPokedex();
-//    }
+    @Scheduled(cron = "* 0 0 * * *")
+    public void salvarResumoPokedex() {
+        resumoService.salvarResumoPokedex();
+    }
+
+    @Scheduled(cron = "* 0 23 * * *")
+    public void enviarResumoPokedex() throws JsonProcessingException, RegraDeNegocioException {
+        resumoService.enviarResumoPokedex();
+    }
 
 
 }

@@ -1,4 +1,4 @@
-package br.com.dbc.pokedex.dto;
+package com.dbc.emailconsumer.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RevelarDTO {
+public class EmailDTO {
+    private String assunto;
     private String nomeTreinador;
     private String destinatario;
     private String mensagem;
-    private PokeDadosDTO pokeDadosDTO;
-
 }

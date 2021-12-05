@@ -15,11 +15,8 @@
                         style="background-color: #d3be6c; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #000000; padding: 0px 15px 10px 15px;">
                         <div>
                             <br> Olá ${nome},
-                            <br>
-                            ${message}
                             <br><br>
-                            Nome do Pokémon: ${nomePokemon}
-                            Número do Pokémon: ${numeroPoke}
+                            ${message}
                             <br> <br>
                             Qualquer dúvida é só contatar o suporte pelo e-mail ${remetente}.
                             <br><br>

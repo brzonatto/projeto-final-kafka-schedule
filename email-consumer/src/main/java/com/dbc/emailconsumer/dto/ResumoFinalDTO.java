@@ -1,11 +1,10 @@
-package br.com.dbc.pokedex.dto;
+package com.dbc.emailconsumer.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data

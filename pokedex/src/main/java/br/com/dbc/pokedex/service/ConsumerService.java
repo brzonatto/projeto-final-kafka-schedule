@@ -27,8 +27,7 @@ public class ConsumerService {
             topics = "${kafka.topic.updatePokeDados}",
             groupId = "${kafka.group-id}",
             topicPartitions = {@TopicPartition(topic = "${kafka.topic.updatePokeDados}", partitions = {"0", "1"})},
-            containerFactory = "listenerContainerFactoryEarliest",
-            clientIdPrefix = "private2"
+            containerFactory = "listenerContainerFactoryEarliest"
     )
     public void consume(@Payload String mensagem, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) Integer partition) throws JsonProcessingException {
         if (partition == 1) {

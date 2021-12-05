@@ -1,7 +1,6 @@
 package br.com.dbc.pokedex.kafka;
 
-import br.com.dbc.pokedex.dto.ResumoFinalDTO;
-import br.com.dbc.pokedex.dto.RevelarDTO;
+import br.com.dbc.pokedex.dto.EmailDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +27,8 @@ public class Producer {
     @Value(value = "${kafka.topic.send}")
     private String send;
 
-    public void sendResumo(ResumoFinalDTO resumoFinalDTO) throws JsonProcessingException {
-        String payload = objectMapper.writeValueAsString(resumoFinalDTO);
+    public void sendResumo(EmailDTO emailDTO) throws JsonProcessingException {
+        String payload = objectMapper.writeValueAsString(emailDTO);
         Message<String> message = MessageBuilder.withPayload(payload)
                 .setHeader(KafkaHeaders.TOPIC, send)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())
@@ -38,8 +37,8 @@ public class Producer {
         callBack(message);
     }
 
-    public void sendRevelarPokemon(RevelarDTO revelarDTO) throws JsonProcessingException {
-        String payload = objectMapper.writeValueAsString(revelarDTO);
+    public void sendRevelarPokemon(EmailDTO emailDTO) throws JsonProcessingException {
+        String payload = objectMapper.writeValueAsString(emailDTO);
         Message<String> message = MessageBuilder.withPayload(payload)
                 .setHeader(KafkaHeaders.TOPIC, send)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, UUID.randomUUID().toString())

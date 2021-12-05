@@ -3,6 +3,7 @@ package br.com.dbc.pokedex.service;
 import br.com.dbc.pokedex.dto.NumeroNomeDTO;
 import br.com.dbc.pokedex.dto.PokeDadosDTO;
 import br.com.dbc.pokedex.dto.ResumoFinalDTO;
+import br.com.dbc.pokedex.dto.EmailDTO;
 import br.com.dbc.pokedex.entity.PokedexEntity;
 import br.com.dbc.pokedex.entity.ResumoEntity;
 import br.com.dbc.pokedex.entity.TreinadorEntity;
@@ -17,6 +18,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +72,29 @@ public class ResumoService {
             }
             resumoFinal.setPokemonsReveladosHoje(numeroNomeReveladosHoje);
             resumoFinal.setTotalPokemonsRevelados(key.getPokedex().getQuantidadePokemonsRevelados() + numeroNomeReveladosHoje.size());
-            producer.sendResumo(resumoFinal);
+            resumoFinal.setNomeTreinador(key.getTreinador().getNomeCompleto());
+            EmailDTO emailDTO = new EmailDTO();
+            emailDTO.setDestinatario(treinador.getEmail());
+            emailDTO.setNomeTreinador(treinador.getNomeCompleto());
+            emailDTO.setMensagem(
+                    "Esse é seu Resumo de " + resumoFinal.getDataResumo().format(DateTimeFormatter.ofPattern("dd/MM/yy")) +
+                            "<br><br> Total de treinadores no mundo: " + resumoFinal.getTotalTreinadores() +
+                            "<br>Total de Pokémons no mundo: " + resumoFinal.getTotalPokemons() +
+                            "<br>Total de Pokémons Revelados: " + resumoFinal.getTotalPokemonsRevelados() +
+                            "<br>Número de Pokémons revelados hoje: " + resumoFinal.getTotalPokemonsReveladosHoje() +
+                            "<br><br> Esses foram os Pokémons que você revelou hoje: <br>" +
+                            numeroNome(resumoFinal.getPokemonsReveladosHoje())
+            );
+            emailDTO.setAssunto("Resumo do dia " + resumoFinal.getDataResumo().format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "!");
+            producer.sendResumo(emailDTO);
         }
+    }
+
+    public String numeroNome(List<NumeroNomeDTO> list) {
+        String string = "";
+        for (NumeroNomeDTO key : list) {
+            string += key.getNumero() + " " + key.getNome() + "<br>";
+        }
+        return string;
     }
 }

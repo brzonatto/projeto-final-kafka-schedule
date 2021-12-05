@@ -1,6 +1,6 @@
 package com.dbc.emailconsumer.service;
 
-import com.dbc.emailconsumer.dto.KafkaDTO;
+import com.dbc.emailconsumer.dto.EmailDTO;
 import com.dbc.emailconsumer.dto.RevelarDTO;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -27,22 +27,20 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private final Configuration configuration;
 
-    public void sendEmailPessoa(RevelarDTO revelarDTO) throws MessagingException, IOException, TemplateException {
+    public void sendEmail(EmailDTO emailDTO) throws MessagingException, IOException, TemplateException {
         MimeMessage mimeMessage = emailSender.createMimeMessage();
 
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
         helper.setFrom(remetente, "Pokedex");
-        helper.setTo(revelarDTO.getDestinatario());
+        helper.setTo(emailDTO.getDestinatario());
         helper.setSubject("Pokémon revelado!");
 
         Template template = configuration.getTemplate("email-template.ftl");
         Map<String, Object> dados = new HashMap<>();
-        dados.put("nome", revelarDTO.getNomeTreinador());
-        dados.put("message", revelarDTO.getMensagem());
+        dados.put("nome", emailDTO.getNomeTreinador());
+        dados.put("message", emailDTO.getMensagem());
         dados.put("remetente", remetente);
-        dados.put("nomePokemon", revelarDTO.getPokeDadosDTO().getPokemon().getNome());
-        dados.put("numeroPoke", revelarDTO.getPokeDadosDTO().getPokemon().getNumero());
         String html = FreeMarkerTemplateUtils.processTemplateIntoString(template, dados);
 
         helper.setText(html, true);

@@ -1,4 +1,4 @@
-package com.dbc.emailconsumer.dto;
+package br.com.dbc.pokedex.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class KafkaDTO {
-    private String nome;
-    private String destinatario;
+public class EmailDTO {
     private String assunto;
-    private String texto;
+    private String nomeTreinador;
+    private String destinatario;
+    private String mensagem;
 }

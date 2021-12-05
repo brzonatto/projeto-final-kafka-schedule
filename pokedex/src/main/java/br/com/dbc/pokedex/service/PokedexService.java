@@ -128,8 +128,15 @@ public class PokedexService {
         pokedexEntity.setQuantidadePokemonsRevelados(pokemons.size());
 
         PokedexEntity pokedexUpdate = pokedexRepository.save(pokedexEntity);
-        String mensagem = "Parabéns! Você revelou um Pokémon!";
-        producer.sendRevelarPokemon(new RevelarDTO(treinadorEntity.getNomeCompleto(), treinadorEntity.getEmail(),mensagem, pokeDadosDTO));
+        String mensagem = "Parabéns! Você revelou um Pokémon!" +
+                "<br><br>Nome do pokemon é " + pokeDadosDTO.getPokemon().getNome() +
+                " E essas são algumas de suas caracteristicas: " +
+                "<br><br>Nome: " + pokeDadosDTO.getPokemon().getNome() +
+                "<br><br>Número: " + pokeDadosDTO.getPokemon().getNumero() +
+                "<br><br>Categoria: " + pokeDadosDTO.getPokemon().getCategoria() +
+                "<br><br>Level: " + pokeDadosDTO.getPokemon().getLevel() +
+                "<br><br>Tipos: " + pokeDadosDTO.getTipos().toString();
+        producer.sendRevelarPokemon(new EmailDTO("Parabéns você revelou um novo Pokémon!" ,treinadorEntity.getNomeCompleto(), treinadorEntity.getEmail(), mensagem));
 
         return objectMapper.convertValue(pokedexUpdate, PokedexDTO.class);
     }
