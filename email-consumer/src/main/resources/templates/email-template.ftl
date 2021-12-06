@@ -13,8 +13,8 @@
             <table width="600" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                     <td align="center" valign="top"
-                        style="background-image: linear-gradient(180deg, #f1dede, #e1e0d8, #14e4ff); font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold; color: #000; padding: 0px 15px 10px 15px; border-radius: 5px">
-                      <img src="http://1.bp.blogspot.com/-8iQ4LRc928U/T-xLhUoYAzI/AAAAAAAAQ6E/3JC30z-kDZ0/s1600/Pokemon_1.png" alt="poke-logo" width=280px>
+                        style="background-image: linear-gradient(180deg, #f1dede, #e1e0d8 50%, #14e4ff); font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold; color: #000; padding: 0px 15px 10px 15px; border-radius: 5px">
+                        <img src="http://1.bp.blogspot.com/-8iQ4LRc928U/T-xLhUoYAzI/AAAAAAAAQ6E/3JC30z-kDZ0/s1600/Pokemon_1.png" alt="poke-logo" width=280px>
                         <div>
                             <br> Olá ${nome},
                             <br><br>
