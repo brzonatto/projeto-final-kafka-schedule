@@ -1,18 +1,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Pokemail</title>
+    <title>Java Mail</title>
+    <link href="//db.onlinewebfonts.com/c/f4d1593471d222ddebd973210265762a?family=Pokemon" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
-        <td align="center" valign="top" bgcolor="#838383"
-            style="background-color: #838383;"><br> <br>
+        <td align="center" valign="top"
+            style="background-color: #FFF;"><br> <br>
             <table width="600" border="0" cellspacing="0" cellpadding="0">
                 <tr>
-                    <td align="center" valign="top" bgcolor="#d3be6c"
-                        style="background-color: #d3be6c; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #000000; padding: 0px 15px 10px 15px;">
+                    <td align="center" valign="top"
+                        style="background-image: linear-gradient(180deg, #f1dede, #e1e0d8 50%, #14e4ff); font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold; color: #000; padding: 0px 15px 10px 15px; border-radius: 5px">
+                      <img src="Pokemon_1.png" width=280px>
                         <div>
                             <br> Olá ${nome},
                             <br><br>
@@ -22,7 +24,7 @@
                             <br><br>
                             Att,
                             <br>
-                            Sistema.
+                            Pokedex.
                         </div>
                     </td>
                 </tr>
