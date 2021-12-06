@@ -111,12 +111,21 @@ public class PokedexService {
                 .orElseThrow(() -> new RegraDeNegocioException("Pokemon não encontrado"));
     }
 
+    public Boolean existPokemon(PokedexEntity pokedex, PokeDadosDTO pokemon){
+        for (PokeDadosDTO key : pokedex.getPokemons()) {
+            if(key.getPokemon().getNumero().equals(pokemon.getPokemon().getNumero())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public PokedexDTO revelarPokemon(Integer numeroPokemon, String idTreinador, String authorizationHeader) throws RegraDeNegocioException, JsonProcessingException {
         TreinadorEntity treinadorEntity = treinadorService.getTreinadorById(idTreinador);
         PokedexEntity pokedexEntity = getPokedexById(treinadorEntity.getPokedexEntity().getIdPokedex());
         List<PokeDadosDTO> pokemons = pokedexEntity.getPokemons();
         PokeDadosDTO pokeDadosDTO = getPokeDadosByNumero(numeroPokemon, authorizationHeader);
-        if (!pokemons.contains(pokeDadosDTO)) {
+        if (existPokemon(pokedexEntity, pokeDadosDTO)) {
             pokemons.add(pokeDadosDTO);
         } else {
             throw new RegraDeNegocioException("Pokemon já revelado");
@@ -130,15 +139,23 @@ public class PokedexService {
         PokedexEntity pokedexUpdate = pokedexRepository.save(pokedexEntity);
         String mensagem = "Parabéns! Você revelou um Pokémon!" +
                 "<br><br>Nome do pokemon é " + pokeDadosDTO.getPokemon().getNome() +
-                " E essas são algumas de suas caracteristicas: " +
+                ".<br>E essas são algumas de suas caracteristicas: " +
                 "<br><br>Nome: " + pokeDadosDTO.getPokemon().getNome() +
                 "<br>Número: " + pokeDadosDTO.getPokemon().getNumero() +
                 "<br>Categoria: " + pokeDadosDTO.getPokemon().getCategoria() +
                 "<br>Level: " + pokeDadosDTO.getPokemon().getLevel() +
-                "<br>Tipos: " + pokeDadosDTO.getTipos().toString();
+                "<br>Tipos: " + tipos(pokeDadosDTO.getTipos());
         producer.sendRevelarPokemon(new EmailDTO("Parabéns você revelou um novo Pokémon!" ,treinadorEntity.getNomeCompleto(), treinadorEntity.getEmail(), mensagem));
 
         return objectMapper.convertValue(pokedexUpdate, PokedexDTO.class);
+    }
+
+    public String tipos(List<String> list) {
+        StringBuilder string = new StringBuilder();
+        for (String key : list) {
+            string.append(key).append(", ");
+        }
+        return string.deleteCharAt(string.length() - 2).toString();
     }
 
     public PokedexDadosDTO getDadosPokedex(String idTreinador) throws RegraDeNegocioException {

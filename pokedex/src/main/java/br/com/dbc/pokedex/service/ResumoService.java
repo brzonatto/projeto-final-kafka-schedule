@@ -93,7 +93,7 @@ public class ResumoService {
     public String numeroNome(List<NumeroNomeDTO> list) {
         String string = "";
         for (NumeroNomeDTO key : list) {
-            string += key.getNumero() + " " + key.getNome() + "<br>";
+            string += key.getNumero() + " - " + key.getNome() + "<br>";
         }
         return string;
     }
