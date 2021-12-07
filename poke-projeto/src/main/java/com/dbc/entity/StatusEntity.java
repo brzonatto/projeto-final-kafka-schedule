@@ -9,6 +9,8 @@ import java.io.Serializable;
 @Setter
 @Getter
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class StatusEntity implements Serializable {
     @Column(name = "hp_status")
     private Integer hp;
