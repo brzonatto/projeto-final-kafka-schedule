@@ -12,6 +12,5 @@ public interface ResumoRepository extends MongoRepository<ResumoEntity, String> 
     @Query("{'treinador._id': ?0}")
     ResumoEntity searchResumoByTreinador(ObjectId objectId);
 
-
     Boolean existsByTreinador(TreinadorEntity treinador);
 }
