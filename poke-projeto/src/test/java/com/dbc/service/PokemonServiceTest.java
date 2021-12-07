@@ -44,6 +44,6 @@ class PokemonServiceTest {
         pokemonCreateDTO.setStatus(statusDTO);
         Integer soma = pokemonService.somaStatus(pokemonCreateDTO);
 
-        Assertions.assertEquals(soma, 600);
+        Assertions.assertEquals(soma, 580);
     }
 }
